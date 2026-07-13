@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="学英语" />
+  <link rel="manifest" href="manifest.json" />
+  <title>学英语 · 句子播放器</title>
+  <style>
+    :root {
+      --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280;
+      --primary:#2563eb; --danger:#dc2626; --border:#d1d5db; --fav:#f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+      "PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text);
+    }
+    header {
+      position:sticky; top:0; z-index:10; padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
+      background:#111827; color:white;
+    }
+    header h1 { margin:0 0 4px; font-size:22px; }
+    header p { margin:0; font-size:13px; opacity:.8; }
+    main { max-width:760px; margin:auto; padding:14px 14px calc(100px + env(safe-area-inset-bottom)); }
+    .panel,.card {
+      background:var(--card); border-radius:16px; padding:14px; margin-bottom:12px;
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
+    }
+    label { display:block; font-size:13px; font-weight:700; margin:10px 0 6px; }
+    textarea,input,select {
+      width:100%; font-size:16px; border:1px solid var(--border); border-radius:12px;
+      padding:12px; background:white; color:var(--text);
+    }
+    textarea { min-height:76px; resize:vertical; }
+    .row { display:flex; gap:8px; align-items:center; }
+    .row > * { flex:1; }
+    button {
+      border:0; border-radius:12px; padding:12px 14px; font-size:15px; font-weight:700;
+      background:#e5e7eb; color:#111827; cursor:pointer;
+    }
+    button.primary { background:var(--primary); color:white; }
+    button.danger { background:#fee2e2; color:var(--danger); }
+    button.fav { background:#fef3c7; color:#92400e; }
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .toolbar button { flex:1 1 120px; }
+    .sentence-en { font-size:21px; font-weight:800; line-height:1.35; margin:0 0 8px; }
+    .sentence-zh { font-size:17px; line-height:1.5; color:#374151; margin:0 0 12px; }
+    .meta { font-size:12px; color:var(--muted); margin-top:8px; }
+    .empty { text-align:center; color:var(--muted); padding:34px 8px; }
+    .switchline { display:flex; gap:10px; align-items:center; margin-top:10px; }
+    .switchline input { width:auto; transform:scale(1.2); }
+    .top-controls { display:grid; grid-template-columns:1fr 120px; gap:8px; }
+    .count { font-size:13px; color:var(--muted); margin:8px 2px 12px; }
+    .mini { padding:8px 10px; font-size:13px; }
+    @media (max-width:520px) {
+      .top-controls { grid-template-columns:1fr; }
+      .sentence-en { font-size:20px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>学英语 · 句子播放器</h1>
+  <p>添加句子、播放美式英语、收藏、搜索、循环练习</p>
+</header>
+
+<main>
+  <section class="panel">
+    <label for="english">英文句子</label>
+    <textarea id="english" placeholder="例如：Are you paying?"></textarea>
+
+    <label for="chinese">中文意思</label>
+    <textarea id="chinese" placeholder="例如：是您付款吗？"></textarea>
+
+    <div class="row">
+      <button id="clearForm">清空</button>
+      <button class="primary" id="saveSentence">保存句子</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="top-controls">
+      <input id="search" type="search" placeholder="搜索英文或中文" />
+      <select id="filter">
+        <option value="all">全部句子</option>
+        <option value="favorite">只看收藏</option>
+      </select>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label for="speed" style="margin-top:0">英文速度</label>
+        <select id="speed">
+          <option value="0.5">0.5× 超慢</option>
+          <option value="0.65">0.65× 很慢</option>
+          <option value="0.8" selected>0.8× 慢速</option>
+          <option value="1">1.0× 正常</option>
+        </select>
+      </div>
+      <div>
+        <label for="repeatCount" style="margin-top:0">重复次数</label>
+        <select id="repeatCount">
+          <option value="1">1 次</option>
+          <option value="2">2 次</option>
+          <option value="3" selected>3 次</option>
+          <option value="5">5 次</option>
+          <option value="10">10 次</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="switchline">
+      <input type="checkbox" id="playChineseAfter" checked />
+      <label for="playChineseAfter" style="margin:0;font-weight:600">英文后播放中文</label>
+    </div>
+
+    <div class="toolbar">
+      <button id="playAll">▶ 播放当前列表</button>
+      <button id="stopAll">■ 停止播放</button>
+      <button id="exportData">导出备份</button>
+      <button id="importData">导入备份</button>
+      <input id="importFile" type="file" accept="application/json" hidden />
+    </div>
+  </section>
+
+  <div class="count" id="count"></div>
+  <section id="list"></section>
+</main>
+
+<script>
+const STORAGE_KEY = "english_sentence_app_v1";
+let sentences = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let playing = false;
+
+const $ = id => document.getElementById(id);
+const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(sentences));
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function currentList() {
+  const q = $("search").value.trim().toLowerCase();
+  const onlyFav = $("filter").value === "favorite";
+  return sentences.filter(s => {
+    const match = !q || s.en.toLowerCase().includes(q) || s.zh.toLowerCase().includes(q);
+    return match && (!onlyFav || s.favorite);
+  });
+}
+
+function render() {
+  const data = currentList();
+  $("count").textContent = `共 ${data.length} 句`;
+  if (!data.length) {
+    $("list").innerHTML = `<div class="panel empty">还没有句子。先在上面添加一句英语。</div>`;
+    return;
+  }
+
+  $("list").innerHTML = data.map(s => `
+    <article class="card">
+      <p class="sentence-en">${escapeHtml(s.en)}</p>
+      <p class="sentence-zh">${escapeHtml(s.zh)}</p>
+      <div class="toolbar">
+        <button onclick="playEnglish('${s.id}')">▶ 英文</button>
+        <button onclick="playChinese('${s.id}')">▶ 中文</button>
+        <button onclick="playBoth('${s.id}')">🔁 跟读</button>
+        <button class="${s.favorite ? "fav" : ""}" onclick="toggleFavorite('${s.id}')">
+          ${s.favorite ? "★ 已收藏" : "☆ 收藏"}
+        </button>
+        <button class="danger" onclick="removeSentence('${s.id}')">删除</button>
+      </div>
+      <div class="meta">保存时间：${new Date(s.createdAt).toLocaleString()}</div>
+    </article>
+  `).join("");
+}
+
+function getVoice(langPrefix) {
+  const voices = speechSynthesis.getVoices();
+  if (langPrefix === "en") {
+    return voices.find(v => /en-US/i.test(v.lang) && /Samantha|Ava|Allison|Susan|Zoe/i.test(v.name))
+      || voices.find(v => /en-US/i.test(v.lang))
+      || voices.find(v => /^en/i.test(v.lang));
+  }
+  return voices.find(v => /zh-CN/i.test(v.lang))
+    || voices.find(v => /^zh/i.test(v.lang));
+}
+
+function speak(text, lang, rate=1) {
+  return new Promise(resolve => {
+    if (!text) return resolve();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = rate;
+    const v = getVoice(lang.startsWith("en") ? "en" : "zh");
+    if (v) u.voice = v;
+    u.onend = resolve;
+    u.onerror = resolve;
+    speechSynthesis.speak(u);
+  });
+}
+
+function pause(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+async function playEnglish(id) {
+  playing = false;
+  speechSynthesis.cancel();
+  const s = sentences.find(x => x.id === id);
+  if (s) await speak(s.en, "en-US", Number($("speed").value));
+}
+
+async function playChinese(id) {
+  playing = false;
+  speechSynthesis.cancel();
+  const s = sentences.find(x => x.id === id);
+  if (s) await speak(s.zh, "zh-CN", 0.9);
+}
+
+async function playBoth(id) {
+  speechSynthesis.cancel();
+  playing = true;
+  const s = sentences.find(x => x.id === id);
+  if (!s) return;
+  const count = Number($("repeatCount").value);
+  for (let i = 0; i < count && playing; i++) {
+    await speak(s.en, "en-US", Number($("speed").value));
+    if (!playing) break;
+    await pause(450);
+    if ($("playChineseAfter").checked) {
+      await speak(s.zh, "zh-CN", 0.9);
+      await pause(650);
+    }
+  }
+  playing = false;
+}
+
+async function playCurrentList() {
+  speechSynthesis.cancel();
+  playing = true;
+  const list = currentList();
+  const count = Number($("repeatCount").value);
+  for (const s of list) {
+    for (let i = 0; i < count && playing; i++) {
+      await speak(s.en, "en-US", Number($("speed").value));
+      if (!playing) break;
+      await pause(400);
+      if ($("playChineseAfter").checked) {
+        await speak(s.zh, "zh-CN", 0.9);
+        await pause(700);
+      }
+    }
+    if (!playing) break;
+  }
+  playing = false;
+}
+
+function toggleFavorite(id) {
+  const s = sentences.find(x => x.id === id);
+  if (s) s.favorite = !s.favorite;
+  save(); render();
+}
+
+function removeSentence(id) {
+  if (!confirm("确定删除这句话吗？")) return;
+  sentences = sentences.filter(x => x.id !== id);
+  save(); render();
+}
+
+$("saveSentence").onclick = () => {
+  const en = $("english").value.trim();
+  const zh = $("chinese").value.trim();
+  if (!en) return alert("请先输入英文句子。");
+  sentences.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,8),
+    en, zh, favorite:false, createdAt:new Date().toISOString()
+  });
+  save();
+  $("english").value = "";
+  $("chinese").value = "";
+  render();
+};
+
+$("clearForm").onclick = () => {
+  $("english").value = "";
+  $("chinese").value = "";
+};
+
+$("search").oninput = render;
+$("filter").onchange = render;
+$("playAll").onclick = playCurrentList;
+$("stopAll").onclick = () => {
+  playing = false;
+  speechSynthesis.cancel();
+};
+
+$("exportData").onclick = () => {
+  const blob = new Blob([JSON.stringify(sentences, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "english-sentences-backup.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+$("importData").onclick = () => $("importFile").click();
+$("importFile").onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!Array.isArray(data)) throw new Error("格式不正确");
+    sentences = data;
+    save();
+    render();
+    alert("导入成功。");
+  } catch {
+    alert("导入失败：文件格式不正确。");
+  }
+  e.target.value = "";
+};
+
+speechSynthesis.onvoiceschanged = () => {};
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));
+}
+render();
+</script>
+</body>
+</html>
