@@ -1,129 +1,217 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="学英语" />
-  <link rel="manifest" href="manifest.json" />
-  <title>学英语 · 句子播放器</title>
-  <style>
-    :root {
-      --bg:#f3f4f6; --card:#ffffff; --text:#111827; --muted:#6b7280;
-      --primary:#2563eb; --danger:#dc2626; --border:#d1d5db; --fav:#f59e0b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
-      "PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text);
-    }
-    header {
-      position:sticky; top:0; z-index:10; padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
-      background:#111827; color:white;
-    }
-    header h1 { margin:0 0 4px; font-size:22px; }
-    header p { margin:0; font-size:13px; opacity:.8; }
-    main { max-width:760px; margin:auto; padding:14px 14px calc(100px + env(safe-area-inset-bottom)); }
-    .panel,.card {
-      background:var(--card); border-radius:16px; padding:14px; margin-bottom:12px;
-      box-shadow:0 2px 12px rgba(0,0,0,.06);
-    }
-    label { display:block; font-size:13px; font-weight:700; margin:10px 0 6px; }
-    textarea,input,select {
-      width:100%; font-size:16px; border:1px solid var(--border); border-radius:12px;
-      padding:12px; background:white; color:var(--text);
-    }
-    textarea { min-height:76px; resize:vertical; }
-    .row { display:flex; gap:8px; align-items:center; }
-    .row > * { flex:1; }
-    button {
-      border:0; border-radius:12px; padding:12px 14px; font-size:15px; font-weight:700;
-      background:#e5e7eb; color:#111827; cursor:pointer;
-    }
-    button.primary { background:var(--primary); color:white; }
-    button.danger { background:#fee2e2; color:var(--danger); }
-    button.fav { background:#fef3c7; color:#92400e; }
-    .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .toolbar button { flex:1 1 120px; }
-    .sentence-en { font-size:21px; font-weight:800; line-height:1.35; margin:0 0 8px; }
-    .sentence-zh { font-size:17px; line-height:1.5; color:#374151; margin:0 0 12px; }
-    .meta { font-size:12px; color:var(--muted); margin-top:8px; }
-    .empty { text-align:center; color:var(--muted); padding:34px 8px; }
-    .switchline { display:flex; gap:10px; align-items:center; margin-top:10px; }
-    .switchline input { width:auto; transform:scale(1.2); }
-    .top-controls { display:grid; grid-template-columns:1fr 120px; gap:8px; }
-    .count { font-size:13px; color:var(--muted); margin:8px 2px 12px; }
-    .mini { padding:8px 10px; font-size:13px; }
-    @media (max-width:520px) {
-      .top-controls { grid-template-columns:1fr; }
-      .sentence-en { font-size:20px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="小白学英语">
+<link rel="manifest" href="manifest.json">
+<title>小白学英语 V3</title>
+<style>
+:root{
+  --bg:#f1f5f9;--card:#fff;--ink:#0f172a;--muted:#64748b;
+  --blue:#2563eb;--blue2:#1d4ed8;--green:#059669;--red:#dc2626;
+  --line:#cbd5e1;--soft:#e2e8f0;--gold:#f59e0b
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif
+}
+header{
+  position:sticky;top:0;z-index:20;
+  padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
+  background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff
+}
+header h1{margin:0;font-size:24px}
+header p{margin:5px 0 0;font-size:13px;opacity:.86}
+main{max-width:780px;margin:auto;padding:14px 14px calc(110px + env(safe-area-inset-bottom))}
+.panel,.card{
+  background:var(--card);border-radius:18px;padding:14px;margin-bottom:12px;
+  box-shadow:0 3px 16px rgba(15,23,42,.07)
+}
+.hero{background:linear-gradient(135deg,#eff6ff,#ecfeff);border:1px solid #bfdbfe}
+.hero h2{margin:0 0 6px;font-size:18px}
+.hero p{margin:0;color:#334155;line-height:1.55;font-size:14px}
+.status{padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.45;background:#fff7ed;color:#9a3412;margin-bottom:12px}
+.status.ok{background:#ecfdf5;color:#065f46}
+.status.bad{background:#fef2f2;color:#991b1b}
+label{display:block;font-size:13px;font-weight:800;margin:10px 0 6px}
+textarea,input,select{
+  width:100%;font-size:16px;padding:12px;border:1px solid var(--line);
+  border-radius:12px;background:#fff;color:var(--ink)
+}
+textarea{min-height:76px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.row{display:flex;gap:8px;align-items:center}
+button{
+  border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:800;
+  background:var(--soft);color:var(--ink);cursor:pointer
+}
+button.primary{background:var(--blue);color:#fff}
+button.green{background:var(--green);color:#fff}
+button.danger{background:#fee2e2;color:var(--red)}
+button.starred{background:#fef3c7;color:#92400e}
+button:disabled{opacity:.55}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.toolbar button{flex:1 1 118px}
+.tabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+.tab{
+  white-space:nowrap;padding:9px 12px;border-radius:999px;background:#e2e8f0;
+  font-size:13px;font-weight:800;cursor:pointer
+}
+.tab.active{background:#1d4ed8;color:#fff}
+.en{font-size:22px;font-weight:900;line-height:1.35;margin:0 0 6px}
+.zh{font-size:17px;line-height:1.5;color:#334155;margin:0 0 9px}
+.natural{font-size:14px;color:#047857;font-weight:800;margin:0 0 8px}
+.tag{display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+.badge{font-size:12px;background:#dcfce7;color:#166534;padding:4px 8px;border-radius:999px;font-weight:800}
+.meta{font-size:12px;color:var(--muted);margin-top:8px}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
+.count{font-size:13px;color:var(--muted);margin:8px 2px 12px}
+.empty{text-align:center;color:var(--muted);padding:34px 8px}
+.switchline{display:flex;gap:10px;align-items:center;margin-top:10px}
+.switchline input{width:auto;transform:scale(1.2)}
+.footerbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid #e2e8f0
+}
+.footerbar .inner{max-width:780px;margin:auto;display:flex;gap:8px}
+.footerbar button{flex:1}
+@media(max-width:560px){.grid2,.grid3{grid-template-columns:1fr}.en{font-size:20px}}
+</style>
 </head>
 <body>
 <header>
-  <h1>学英语 · 句子播放器</h1>
-  <p>添加句子、播放美式英语、收藏、搜索、循环练习</p>
+  <h1>小白学英语</h1>
+  <p>真人感美式发音 · 自动翻译 · 纽约工作现场英语</p>
 </header>
 
 <main>
+  <section class="panel hero">
+    <h2>每天学真正用得到的英语</h2>
+    <p>安装、浴室门、玻璃、雨棚、栏杆、收款、开车和日常交流，全部集中在一个 App 里。</p>
+  </section>
+
+  <div id="apiStatus" class="status">正在检查真人语音服务……</div>
+
   <section class="panel">
-    <label for="english">英文句子</label>
-    <textarea id="english" placeholder="例如：Are you paying?"></textarea>
-
-    <label for="chinese">中文意思</label>
-    <textarea id="chinese" placeholder="例如：是您付款吗？"></textarea>
-
-    <div class="row">
-      <button id="clearForm">清空</button>
-      <button class="primary" id="saveSentence">保存句子</button>
-    </div>
+    <div class="tabs" id="categoryTabs"></div>
   </section>
 
   <section class="panel">
-    <div class="top-controls">
-      <input id="search" type="search" placeholder="搜索英文或中文" />
-      <select id="filter">
-        <option value="all">全部句子</option>
-        <option value="favorite">只看收藏</option>
-      </select>
+    <label for="english">英文句子</label>
+    <textarea id="english" placeholder="例如：Hi, I'm here to install the shower door."></textarea>
+
+    <div class="toolbar">
+      <button id="englishToChinese">英文 → 中文</button>
+      <button id="preview" class="primary">▶ 真人发音试听</button>
     </div>
 
-    <div class="row" style="margin-top:10px">
+    <label for="chinese">中文意思</label>
+    <textarea id="chinese" placeholder="例如：你好，我是来安装浴室门的。"></textarea>
+
+    <div class="toolbar">
+      <button id="chineseToEnglish" class="green">中文 → 英文</button>
+    </div>
+
+    <div class="grid2">
       <div>
-        <label for="speed" style="margin-top:0">英文速度</label>
+        <label for="category">分类</label>
+        <select id="category"></select>
+      </div>
+      <div>
+        <label for="naturalPhrase">现场自然说法（可不填）</label>
+        <input id="naturalPhrase" placeholder="例如：I'm here t'install..." />
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div>
+        <label for="voice">真人声音</label>
+        <select id="voice">
+          <option value="marin">Marin（推荐）</option>
+          <option value="cedar">Cedar（推荐）</option>
+          <option value="coral">Coral</option>
+          <option value="alloy">Alloy</option>
+          <option value="onyx">Onyx</option>
+          <option value="nova">Nova</option>
+        </select>
+      </div>
+      <div>
+        <label for="speed">语速</label>
         <select id="speed">
-          <option value="0.5">0.5× 超慢</option>
-          <option value="0.65">0.65× 很慢</option>
-          <option value="0.8" selected>0.8× 慢速</option>
+          <option value="0.72">0.72× 很慢</option>
+          <option value="0.82">0.82× 慢速</option>
+          <option value="0.92" selected>0.92× 自然</option>
           <option value="1">1.0× 正常</option>
         </select>
       </div>
       <div>
-        <label for="repeatCount" style="margin-top:0">重复次数</label>
+        <label for="repeatCount">重复次数</label>
         <select id="repeatCount">
           <option value="1">1 次</option>
-          <option value="2">2 次</option>
-          <option value="3" selected>3 次</option>
+          <option value="3">3 次</option>
           <option value="5">5 次</option>
           <option value="10">10 次</option>
+          <option value="999999">一直循环</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <label for="gap">每次停顿</label>
+        <select id="gap">
+          <option value="500">0.5 秒</option>
+          <option value="1000" selected>1 秒</option>
+          <option value="2000">2 秒</option>
+          <option value="3000">3 秒</option>
+        </select>
+      </div>
+      <div>
+        <label for="sortMode">排列方式</label>
+        <select id="sortMode">
+          <option value="newest">最新添加</option>
+          <option value="oldest">最早添加</option>
+          <option value="az">英文字母</option>
         </select>
       </div>
     </div>
 
     <div class="switchline">
-      <input type="checkbox" id="playChineseAfter" checked />
-      <label for="playChineseAfter" style="margin:0;font-weight:600">英文后播放中文</label>
+      <input type="checkbox" id="playChineseAfter">
+      <label for="playChineseAfter" style="margin:0">英文后播放中文</label>
     </div>
 
     <div class="toolbar">
-      <button id="playAll">▶ 播放当前列表</button>
+      <button id="clearForm">清空</button>
+      <button id="saveSentence" class="primary">保存句子</button>
       <button id="stopAll">■ 停止播放</button>
+    </div>
+
+    <p class="small">语音由 OpenAI AI 语音生成，不是真人录音。声音会尽量自然、清晰，并带轻微纽约工作现场节奏。</p>
+  </section>
+
+  <section class="panel">
+    <div class="grid2">
+      <input id="search" type="search" placeholder="搜索英文、中文或分类">
+      <select id="filter">
+        <option value="all">全部句子</option>
+        <option value="favorite">只看收藏</option>
+        <option value="mastered">只看已掌握</option>
+        <option value="learning">只看学习中</option>
+      </select>
+    </div>
+    <div class="toolbar">
+      <button id="playAll">▶ 播放当前列表</button>
       <button id="exportData">导出备份</button>
       <button id="importData">导入备份</button>
-      <input id="importFile" type="file" accept="application/json" hidden />
+      <input id="importFile" type="file" accept="application/json" hidden>
     </div>
   </section>
 
@@ -131,206 +219,237 @@
   <section id="list"></section>
 </main>
 
+<div class="footerbar">
+  <div class="inner">
+    <button id="quickPlay" class="primary">▶ 播放第一句</button>
+    <button id="quickStop">■ 停止</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
 <script>
-const STORAGE_KEY = "english_sentence_app_v1";
-let sentences = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-let playing = false;
+const API=(window.APP_CONFIG&&window.APP_CONFIG.API_BASE_URL||"").replace(/\/$/,"");
+const STORAGE_KEY="xiaobai_english_v3_formal";
+const SETTINGS_KEY="xiaobai_english_v3_settings";
+const categories=["全部","安装英语","浴室门","玻璃","雨棚","栏杆","铝合金门面","收款","开车","日常英语","我的句子"];
 
-const $ = id => document.getElementById(id);
-const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(sentences));
+const starterSentences=[
+  {id:"s1",en:"Hi, I'm here to install the shower door.",zh:"你好，我是来安装浴室门的。",natural:"Hi, I'm here t'install the shower door.",category:"浴室门",favorite:true,mastered:false,createdAt:"2026-07-12T12:00:00.000Z"},
+  {id:"s2",en:"Are you paying today?",zh:"您今天付款吗？",natural:"Are ya paying today?",category:"收款",favorite:true,mastered:false,createdAt:"2026-07-12T12:01:00.000Z"},
+  {id:"s3",en:"I'll be back in about thirty minutes.",zh:"我大约三十分钟后回来。",natural:"I'll be back in 'bout thirty minutes.",category:"日常英语",favorite:false,mastered:false,createdAt:"2026-07-12T12:02:00.000Z"},
+  {id:"s4",en:"Please remove the wood in three days.",zh:"请三天后拆掉木头。",natural:"",category:"玻璃",favorite:false,mastered:false,createdAt:"2026-07-12T12:03:00.000Z"},
+  {id:"s5",en:"The glass hasn't arrived yet.",zh:"玻璃还没有送到。",natural:"",category:"玻璃",favorite:false,mastered:false,createdAt:"2026-07-12T12:04:00.000Z"}
+];
 
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
+let items=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null")||starterSentences;
+let settings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"null")||{};
+let activeCategory="全部";
+let audio=null;
+let playing=false;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function saveAll(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(items));
+  settings={
+    voice:$("voice").value,
+    speed:$("speed").value,
+    repeatCount:$("repeatCount").value,
+    gap:$("gap").value,
+    playChineseAfter:$("playChineseAfter").checked,
+    sortMode:$("sortMode").value
+  };
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
 }
 
-function currentList() {
-  const q = $("search").value.trim().toLowerCase();
-  const onlyFav = $("filter").value === "favorite";
-  return sentences.filter(s => {
-    const match = !q || s.en.toLowerCase().includes(q) || s.zh.toLowerCase().includes(q);
-    return match && (!onlyFav || s.favorite);
-  });
+function populateCategories(){
+  $("category").innerHTML=categories.filter(x=>x!=="全部").map(x=>`<option>${esc(x)}</option>`).join("");
+  $("categoryTabs").innerHTML=categories.map(c=>`<div class="tab ${c===activeCategory?"active":""}" onclick="setCategory('${c}')">${esc(c)}</div>`).join("");
 }
+function setCategory(c){activeCategory=c;populateCategories();render()}
 
-function render() {
-  const data = currentList();
-  $("count").textContent = `共 ${data.length} 句`;
-  if (!data.length) {
-    $("list").innerHTML = `<div class="panel empty">还没有句子。先在上面添加一句英语。</div>`;
-    return;
+async function checkApi(){
+  const box=$("apiStatus");
+  if(!API){box.className="status bad";box.textContent="还没有连接 Cloudflare 后台，请先填写 config.js 里的 API_BASE_URL。";return}
+  try{
+    const r=await fetch(API+"/health");
+    if(!r.ok)throw 0;
+    box.className="status ok";
+    box.textContent="真人语音和自动翻译服务已连接。";
+  }catch{
+    box.className="status bad";
+    box.textContent="后台暂时连接不上，请检查 Worker 地址或部署状态。";
   }
+}
 
-  $("list").innerHTML = data.map(s => `
+function currentList(){
+  const q=$("search").value.trim().toLowerCase();
+  const filter=$("filter").value;
+  let data=items.filter(s=>{
+    const categoryOK=activeCategory==="全部"||s.category===activeCategory;
+    const text=`${s.en} ${s.zh} ${s.category} ${s.natural||""}`.toLowerCase();
+    const searchOK=!q||text.includes(q);
+    const filterOK=filter==="all"||(filter==="favorite"&&s.favorite)||(filter==="mastered"&&s.mastered)||(filter==="learning"&&!s.mastered);
+    return categoryOK&&searchOK&&filterOK;
+  });
+  const sort=$("sortMode").value;
+  if(sort==="newest")data.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(sort==="oldest")data.sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+  if(sort==="az")data.sort((a,b)=>a.en.localeCompare(b.en));
+  return data;
+}
+
+function render(){
+  const data=currentList();
+  $("count").textContent=`共 ${data.length} 句`;
+  if(!data.length){$("list").innerHTML='<div class="panel empty">没有找到句子。</div>';return}
+  $("list").innerHTML=data.map(s=>`
     <article class="card">
-      <p class="sentence-en">${escapeHtml(s.en)}</p>
-      <p class="sentence-zh">${escapeHtml(s.zh)}</p>
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div style="flex:1">
+          <p class="en">${esc(s.en)}</p>
+          ${s.natural?`<p class="natural">现场自然说法：${esc(s.natural)}</p>`:""}
+          <p class="zh">${esc(s.zh)}</p>
+        </div>
+        ${s.mastered?'<span class="badge">已掌握</span>':""}
+      </div>
+      <span class="tag">${esc(s.category)}</span>
       <div class="toolbar">
-        <button onclick="playEnglish('${s.id}')">▶ 英文</button>
-        <button onclick="playChinese('${s.id}')">▶ 中文</button>
-        <button onclick="playBoth('${s.id}')">🔁 跟读</button>
-        <button class="${s.favorite ? "fav" : ""}" onclick="toggleFavorite('${s.id}')">
-          ${s.favorite ? "★ 已收藏" : "☆ 收藏"}
-        </button>
+        <button class="primary" onclick="playOne('${s.id}',false)">▶ 真人发音</button>
+        <button onclick="playOne('${s.id}',true)">🔁 循环</button>
+        <button class="${s.favorite?"starred":""}" onclick="toggleFavorite('${s.id}')">${s.favorite?"★ 已收藏":"☆ 收藏"}</button>
+        <button onclick="toggleMastered('${s.id}')">${s.mastered?"改为学习中":"标记已掌握"}</button>
+        <button onclick="editSentence('${s.id}')">编辑</button>
         <button class="danger" onclick="removeSentence('${s.id}')">删除</button>
       </div>
-      <div class="meta">保存时间：${new Date(s.createdAt).toLocaleString()}</div>
-    </article>
-  `).join("");
+      <div class="meta">添加时间：${new Date(s.createdAt).toLocaleString()}</div>
+    </article>`).join("");
 }
 
-function getVoice(langPrefix) {
-  const voices = speechSynthesis.getVoices();
-  if (langPrefix === "en") {
-    return voices.find(v => /en-US/i.test(v.lang) && /Samantha|Ava|Allison|Susan|Zoe/i.test(v.name))
-      || voices.find(v => /en-US/i.test(v.lang))
-      || voices.find(v => /^en/i.test(v.lang));
-  }
-  return voices.find(v => /zh-CN/i.test(v.lang))
-    || voices.find(v => /^zh/i.test(v.lang));
+async function apiJson(path,body){
+  if(!API)throw new Error("还没有填写后台地址");
+  const r=await fetch(API+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok){const t=await r.text();throw new Error(t||"请求失败")}
+  return r;
 }
 
-function speak(text, lang, rate=1) {
-  return new Promise(resolve => {
-    if (!text) return resolve();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
-    u.rate = rate;
-    const v = getVoice(lang.startsWith("en") ? "en" : "zh");
-    if (v) u.voice = v;
-    u.onend = resolve;
-    u.onerror = resolve;
-    speechSynthesis.speak(u);
-  });
+async function translate(direction){
+  const source=direction==="zh-en"?$("chinese").value.trim():$("english").value.trim();
+  if(!source)return alert("请先输入要翻译的内容。");
+  const btn=direction==="zh-en"?$("chineseToEnglish"):$("englishToChinese");
+  const old=btn.textContent;btn.textContent="翻译中…";btn.disabled=true;
+  try{
+    const r=await apiJson("/translate",{text:source,direction});
+    const data=await r.json();
+    if(direction==="zh-en")$("english").value=data.translation;else $("chinese").value=data.translation;
+  }catch(e){alert("翻译失败："+e.message)}
+  finally{btn.textContent=old;btn.disabled=false}
 }
 
-function pause(ms) {
-  return new Promise(r => setTimeout(r, ms));
+async function getAudio(text){
+  const r=await apiJson("/speech",{text,voice:$("voice").value,speed:Number($("speed").value)});
+  return URL.createObjectURL(await r.blob());
 }
 
-async function playEnglish(id) {
-  playing = false;
-  speechSynthesis.cancel();
-  const s = sentences.find(x => x.id === id);
-  if (s) await speak(s.en, "en-US", Number($("speed").value));
+function stopAudio(){
+  playing=false;
+  if(audio){audio.pause();audio.currentTime=0;audio=null}
 }
 
-async function playChinese(id) {
-  playing = false;
-  speechSynthesis.cancel();
-  const s = sentences.find(x => x.id === id);
-  if (s) await speak(s.zh, "zh-CN", 0.9);
-}
-
-async function playBoth(id) {
-  speechSynthesis.cancel();
-  playing = true;
-  const s = sentences.find(x => x.id === id);
-  if (!s) return;
-  const count = Number($("repeatCount").value);
-  for (let i = 0; i < count && playing; i++) {
-    await speak(s.en, "en-US", Number($("speed").value));
-    if (!playing) break;
-    await pause(450);
-    if ($("playChineseAfter").checked) {
-      await speak(s.zh, "zh-CN", 0.9);
-      await pause(650);
-    }
-  }
-  playing = false;
-}
-
-async function playCurrentList() {
-  speechSynthesis.cancel();
-  playing = true;
-  const list = currentList();
-  const count = Number($("repeatCount").value);
-  for (const s of list) {
-    for (let i = 0; i < count && playing; i++) {
-      await speak(s.en, "en-US", Number($("speed").value));
-      if (!playing) break;
-      await pause(400);
-      if ($("playChineseAfter").checked) {
-        await speak(s.zh, "zh-CN", 0.9);
-        await pause(700);
+async function playText(text,repeat,zhText=""){
+  stopAudio();playing=true;
+  try{
+    const url=await getAudio(text);
+    const count=repeat?Number($("repeatCount").value):1;
+    const gap=Number($("gap").value);
+    for(let i=0;i<count&&playing;i++){
+      await new Promise((resolve,reject)=>{
+        audio=new Audio(url);audio.onended=resolve;audio.onerror=()=>reject(new Error("音频播放失败"));audio.play().catch(reject);
+      });
+      if(!playing)break;
+      if($("playChineseAfter").checked&&zhText){
+        await new Promise(r=>setTimeout(r,350));
+        const u=new SpeechSynthesisUtterance(zhText);u.lang="zh-CN";u.rate=.9;
+        await new Promise(resolve=>{u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u)});
       }
+      if(i<count-1)await new Promise(r=>setTimeout(r,gap));
     }
-    if (!playing) break;
+    URL.revokeObjectURL(url);
+  }catch(e){alert("真人发音失败："+e.message)}
+  finally{playing=false}
+}
+
+function playOne(id,repeat){
+  const s=items.find(x=>x.id===id);
+  if(s)playText(s.en,repeat,s.zh);
+}
+
+async function playCurrentList(){
+  stopAudio();playing=true;
+  const list=currentList();
+  for(const s of list){
+    if(!playing)break;
+    await playText(s.en,false,s.zh);
   }
-  playing = false;
 }
 
-function toggleFavorite(id) {
-  const s = sentences.find(x => x.id === id);
-  if (s) s.favorite = !s.favorite;
-  save(); render();
+function toggleFavorite(id){const s=items.find(x=>x.id===id);if(s)s.favorite=!s.favorite;saveAll();render()}
+function toggleMastered(id){const s=items.find(x=>x.id===id);if(s)s.mastered=!s.mastered;saveAll();render()}
+function removeSentence(id){if(confirm("确定删除这句话吗？")){items=items.filter(x=>x.id!==id);saveAll();render()}}
+function editSentence(id){
+  const s=items.find(x=>x.id===id);if(!s)return;
+  $("english").value=s.en;$("chinese").value=s.zh;$("naturalPhrase").value=s.natural||"";$("category").value=s.category;
+  items=items.filter(x=>x.id!==id);saveAll();render();window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function removeSentence(id) {
-  if (!confirm("确定删除这句话吗？")) return;
-  sentences = sentences.filter(x => x.id !== id);
-  save(); render();
-}
-
-$("saveSentence").onclick = () => {
-  const en = $("english").value.trim();
-  const zh = $("chinese").value.trim();
-  if (!en) return alert("请先输入英文句子。");
-  sentences.unshift({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2,8),
-    en, zh, favorite:false, createdAt:new Date().toISOString()
+$("englishToChinese").onclick=()=>translate("en-zh");
+$("chineseToEnglish").onclick=()=>translate("zh-en");
+$("preview").onclick=()=>{const t=$("english").value.trim();if(!t)return alert("请先输入英文。");playText(t,false,$("chinese").value.trim())};
+$("stopAll").onclick=stopAudio;
+$("quickStop").onclick=stopAudio;
+$("quickPlay").onclick=()=>{const list=currentList();if(list[0])playOne(list[0].id,false)};
+$("playAll").onclick=playCurrentList;
+$("saveSentence").onclick=()=>{
+  const en=$("english").value.trim();if(!en)return alert("请先输入英文句子。");
+  items.unshift({
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    en,zh:$("chinese").value.trim(),natural:$("naturalPhrase").value.trim(),
+    category:$("category").value,favorite:false,mastered:false,createdAt:new Date().toISOString()
   });
-  save();
-  $("english").value = "";
-  $("chinese").value = "";
-  render();
+  $("english").value="";$("chinese").value="";$("naturalPhrase").value="";
+  saveAll();render();
+};
+$("clearForm").onclick=()=>{$("english").value="";$("chinese").value="";$("naturalPhrase").value=""};
+$("search").oninput=render;
+$("filter").onchange=render;
+$("sortMode").onchange=()=>{saveAll();render()};
+["voice","speed","repeatCount","gap","playChineseAfter"].forEach(id=>$(id).onchange=saveAll);
+
+$("exportData").onclick=()=>{
+  const payload={app:"小白学英语 V3",exportedAt:new Date().toISOString(),items,settings};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="小白学英语-V3-备份.json";a.click();URL.revokeObjectURL(a.href);
+};
+$("importData").onclick=()=>$("importFile").click();
+$("importFile").onchange=async e=>{
+  const file=e.target.files[0];if(!file)return;
+  try{
+    const data=JSON.parse(await file.text());const imported=Array.isArray(data)?data:data.items;
+    if(!Array.isArray(imported))throw 0;items=imported;if(data.settings)settings=data.settings;saveAll();render();alert("导入成功。");
+  }catch{alert("导入失败：文件格式不正确。")}
+  e.target.value="";
 };
 
-$("clearForm").onclick = () => {
-  $("english").value = "";
-  $("chinese").value = "";
-};
+if(settings.voice)$("voice").value=settings.voice;
+if(settings.speed)$("speed").value=settings.speed;
+if(settings.repeatCount)$("repeatCount").value=settings.repeatCount;
+if(settings.gap)$("gap").value=settings.gap;
+if(typeof settings.playChineseAfter==="boolean")$("playChineseAfter").checked=settings.playChineseAfter;
+if(settings.sortMode)$("sortMode").value=settings.sortMode;
 
-$("search").oninput = render;
-$("filter").onchange = render;
-$("playAll").onclick = playCurrentList;
-$("stopAll").onclick = () => {
-  playing = false;
-  speechSynthesis.cancel();
-};
-
-$("exportData").onclick = () => {
-  const blob = new Blob([JSON.stringify(sentences, null, 2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "english-sentences-backup.json";
-  a.click();
-  URL.revokeObjectURL(a.href);
-};
-
-$("importData").onclick = () => $("importFile").click();
-$("importFile").onchange = async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const data = JSON.parse(await file.text());
-    if (!Array.isArray(data)) throw new Error("格式不正确");
-    sentences = data;
-    save();
-    render();
-    alert("导入成功。");
-  } catch {
-    alert("导入失败：文件格式不正确。");
-  }
-  e.target.value = "";
-};
-
-speechSynthesis.onvoiceschanged = () => {};
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js"));
-}
-render();
+populateCategories();render();checkApi();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js"))}
 </script>
 </body>
 </html>
