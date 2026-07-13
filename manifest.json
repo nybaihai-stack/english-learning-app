@@ -4,8 +4,8 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f1f5f9",
-  "theme_color": "#0f172a",
-  "description": "真人感美式语音、自动翻译和纽约工作现场英语学习工具",
+  "background_color": "#eef2f7",
+  "theme_color": "#0b1220",
+  "description": "真人感美式语音、列表播放和随身听英语学习工具",
   "icons": []
 }
